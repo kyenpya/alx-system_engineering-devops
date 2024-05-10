@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
+#listens on port 98
 
-# This bash script displays all active IPv4 IPs on the machine it’s executed on
-ifconfig | awk -F "[: ]+" '/inet addr:/ { print $4 }'
+ifconfig | grep -oP 'inet \K[\d.]+'
