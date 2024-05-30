@@ -1,10 +1,5 @@
 # 0x09. Web Infrastructure Design
 
-## Curriculum
-**SE Foundations**
-
-**Average**: 124.74%
-
 ### Project Details
 - **Title**: Web Infrastructure Design
 - **Category**: DevOps, SysAdmin, Web Infrastructure
