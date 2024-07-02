@@ -1,56 +1,38 @@
-#!/bin/env bash
+#!/usr/bin/env bash
+# Configures a new ubuntu machine by installing
+# Nginx where it listens on port 80
 
-# Update package list and install nginx
-apt-get update
-apt-get install -y nginx
 
-# Create the HTML file containing "Hello World!" to ensure Nginx is working
-echo "Hello World!" > /var/www/html/index.html
+echo -e "Updating and installing Nginx.\n"
+sudo apt-get update -y -qq && \
+	 sudo apt-get install nginx -y
 
-# Create the custom 404 error page
-echo "Ceci n'est pas une page" > /var/www/html/404.html
+echo -e "\nSetting up some minor stuff.\n"
 
-# Configure Nginx to use the custom 404 error page
-cat <<EOL > /etc/nginx/sites-available/default
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+# starting nginx service
+sudo service nginx start
 
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
+# allowing nginx on firewall
+sudo ufw allow 'Nginx HTTP'
 
-    server_name _;
+# Give the user ownership to website files for easy editing
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
 
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
+# Backup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
 
-    error_page 404 /404.html;
-    location = /404.html {
-        internal;
-    }
+# Creating new index
+echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
 
-    location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
-}
-EOL
+# Setting up /redirect_me to a youtube video
+sudo sed -i '24i\	rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
 
-# Restart nginx service using the service command
-service nginx restart
+# Set up a 404 page
+echo "Ceci n'est pas une page" >> /var/www/html/error_404.html
+sudo sed -i '25i\	error_page 404 /error_404.html;' /etc/nginx/sites-available/default
 
-# Verify that Nginx is running and listening on port 80
-if service nginx status > /dev/null; then
-  echo "Nginx is running."
-else
-  echo "Nginx is not running. Exiting."
-  exit 1
-fi
+# Restarting nginx
+sudo service nginx restart
 
-# Verify that the custom 404 error page is working
-if curl -s http://localhost/nonexistent | grep -q "Ceci n'est pas une page"; then
-  echo "Custom 404 error page configured successfully."
-else
-  echo "Failed to configure custom 404 error page."
-  exit 1
-fi
+echo -e "\nCompleted.\n"
