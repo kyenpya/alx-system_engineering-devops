@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#Install and configure NGINX server
-#return a page with "Hello World!"
+#Installs and configures NGINX server
+#returns a page with "Hello World!"
 
 # Update package list and install Nginx
 sudo apt-get update
@@ -10,7 +10,7 @@ sudo apt-get install -y nginx
 sudo sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
 sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/g' /etc/nginx/sites-available/default
 
-# Create an index.html file with "Hello World!" content
+# Create an index.html file with "Hello World!" as content
 echo "Hello World!" | sudo tee /var/www/html/index.html
 
 # Restart Nginx (do not use systemctl)
